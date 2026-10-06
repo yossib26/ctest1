@@ -24,9 +24,9 @@ function Invoke-Login($req, $res) {
   try {
     $reader = New-Object IO.StreamReader($req.InputStream, [Text.Encoding]::UTF8)
     $data = $reader.ReadToEnd() | ConvertFrom-Json
-    $rows = Invoke-Sql "SELECT username, password_hash FROM users WHERE username = `$1" @([string]$data.username)
+    $rows = Invoke-Sql "SELECT username, password_hash, role FROM users WHERE username = `$1" @([string]$data.username)
     if ($rows -and (Test-PasswordHash ([string]$data.password) $rows[0].password_hash)) {
-      Send-Json $res 200 @{ ok = $true; username = $rows[0].username }
+      Send-Json $res 200 @{ ok = $true; username = $rows[0].username; role = $rows[0].role }
     } else {
       Send-Json $res 401 @{ ok = $false; error = "Invalid username or password" }
     }

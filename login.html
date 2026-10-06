@@ -88,8 +88,10 @@
           card.innerHTML =
             '<h1></h1>' +
             '<p style="text-align:center;color:#188038;">You have logged in successfully.</p>' +
+            '<p style="text-align:center;color:#555;">Role: <strong></strong></p>' +
             '<button onclick="location.reload()">Log out</button>';
           card.querySelector("h1").textContent = "Welcome, " + data.username + "!";
+          card.querySelector("strong").textContent = data.role === "admin" ? "Administrator" : "Regular user";
         } else {
           message.textContent = data.error || "Invalid username or password";
           message.className = "error";
