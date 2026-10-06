@@ -48,6 +48,16 @@
     #message { margin-top: 16px; text-align: center; font-size: 14px; min-height: 18px; }
     .error { color: #d93025; }
     .success { color: #188038; }
+    .loader {
+      width: 48px;
+      height: 48px;
+      margin: 8px auto 16px;
+      border: 5px solid #e0e0e0;
+      border-top-color: #1a73e8;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -84,14 +94,12 @@
         const data = await res.json();
 
         if (data.ok) {
-          const card = document.getElementById("loginCard");
-          card.innerHTML =
-            '<h1></h1>' +
-            '<p style="text-align:center;color:#188038;">You have logged in successfully.</p>' +
-            '<p style="text-align:center;color:#555;">Role: <strong></strong></p>' +
-            '<button onclick="location.reload()">Log out</button>';
-          card.querySelector("h1").textContent = "Welcome, " + data.username + "!";
-          card.querySelector("strong").textContent = data.role === "admin" ? "Administrator" : "Regular user";
+          // Remember who logged in, show the loader for 2 seconds, then go to the message page
+          try { sessionStorage.setItem("user", JSON.stringify({ username: data.username, role: data.role })); } catch (e) {}
+          document.getElementById("loginCard").innerHTML =
+            '<div class="loader"></div>' +
+            '<p style="text-align:center;color:#555;">Signing you in...</p>';
+          setTimeout(function () { location.href = "welcome.html"; }, 2000);
         } else {
           message.textContent = data.error || "Invalid username or password";
           message.className = "error";
