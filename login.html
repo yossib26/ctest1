@@ -97,7 +97,9 @@
           message.className = "error";
         }
       } catch (err) {
-        message.textContent = "Cannot reach the server";
+        message.textContent = location.protocol === "file:"
+          ? "Open this page via http://localhost:8080 (not as a file)"
+          : "Cannot reach the server - is server.ps1 running?";
         message.className = "error";
       }
     });
