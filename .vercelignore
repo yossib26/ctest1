@@ -1,0 +1,3 @@
+# Local-only files (PowerShell server and DB scripts) - not deployed to Vercel
+*.ps1
+.env
