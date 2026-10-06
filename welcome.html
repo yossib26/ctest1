@@ -47,24 +47,46 @@
     <h1 id="title"></h1>
     <p class="success">You have logged in successfully.</p>
     <p>Role: <strong id="role"></strong></p>
+    <p>Session ends in <strong id="countdown"></strong> seconds</p>
     <button id="logout">Log out</button>
   </div>
 
   <script>
+    const SESSION_SECONDS = 30;
+
     let user = null;
     try { user = JSON.parse(sessionStorage.getItem("user")); } catch (e) {}
 
+    function endSession(expired) {
+      try { sessionStorage.removeItem("user"); } catch (e) {}
+      location.replace(expired ? "login.html?expired=1" : "login.html");
+    }
+
+    function secondsLeft() {
+      return Math.ceil((user.loginAt + SESSION_SECONDS * 1000 - Date.now()) / 1000);
+    }
+
     // Not logged in - back to the login page
-    if (!user) {
-      location.replace("login.html");
+    if (!user || !user.loginAt) {
+      endSession(false);
+    } else if (secondsLeft() <= 0) {
+      endSession(true);
     } else {
       document.getElementById("title").textContent = "Welcome, " + user.username + "!";
       document.getElementById("role").textContent = user.role === "admin" ? "Administrator" : "Regular user";
+
+      // Check the session every second; when time is up, clear it and go back to login
+      const countdown = document.getElementById("countdown");
+      countdown.textContent = secondsLeft();
+      setInterval(function () {
+        const left = secondsLeft();
+        if (left <= 0) endSession(true);
+        else countdown.textContent = left;
+      }, 1000);
     }
 
     document.getElementById("logout").addEventListener("click", function () {
-      sessionStorage.removeItem("user");
-      location.replace("login.html");
+      endSession(false);
     });
   </script>
 </body>

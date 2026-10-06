@@ -76,6 +76,13 @@
   </div>
 
   <script>
+    // Coming back from welcome.html after the session timed out
+    if (new URLSearchParams(location.search).get("expired") === "1") {
+      const message = document.getElementById("message");
+      message.textContent = "Your session expired. Please log in again.";
+      message.className = "error";
+    }
+
     // Credentials are checked by the server against the Neon users table
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
       e.preventDefault();
@@ -95,7 +102,9 @@
 
         if (data.ok) {
           // Remember who logged in, show the loader for 2 seconds, then go to the message page
-          try { sessionStorage.setItem("user", JSON.stringify({ username: data.username, role: data.role })); } catch (e) {}
+          try {
+            sessionStorage.setItem("user", JSON.stringify({ username: data.username, role: data.role, loginAt: Date.now() }));
+          } catch (e) {}
           document.getElementById("loginCard").innerHTML =
             '<div class="loader"></div>' +
             '<p style="text-align:center;color:#555;">Signing you in...</p>';
