@@ -66,23 +66,36 @@
   </div>
 
   <script>
-    // Hard-coded credentials (for demo purposes only)
-    const VALID_USER = "admin";
-    const VALID_PASSWORD = "1234";
-
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
+    // Credentials are checked by the server against the Neon users table
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value;
       const message = document.getElementById("message");
+      message.textContent = "Checking...";
+      message.className = "";
 
-      if (user === VALID_USER && pass === VALID_PASSWORD) {
-        document.getElementById("loginCard").innerHTML =
-          '<h1>Welcome, ' + VALID_USER + '!</h1>' +
-          '<p style="text-align:center;color:#188038;">You have logged in successfully.</p>' +
-          '<button onclick="location.reload()">Log out</button>';
-      } else {
-        message.textContent = "Invalid username or password";
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          const card = document.getElementById("loginCard");
+          card.innerHTML =
+            '<h1></h1>' +
+            '<p style="text-align:center;color:#188038;">You have logged in successfully.</p>' +
+            '<button onclick="location.reload()">Log out</button>';
+          card.querySelector("h1").textContent = "Welcome, " + data.username + "!";
+        } else {
+          message.textContent = data.error || "Invalid username or password";
+          message.className = "error";
+        }
+      } catch (err) {
+        message.textContent = "Cannot reach the server";
         message.className = "error";
       }
     });
