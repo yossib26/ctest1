@@ -101,14 +101,14 @@
         const data = await res.json();
 
         if (data.ok) {
-          // Remember who logged in, show the loader for 2 seconds, then go to the message page
+          // Remember who logged in, show the loader for 5 seconds, then go to the message page
           try {
             sessionStorage.setItem("user", JSON.stringify({ username: data.username, role: data.role, loginAt: Date.now() }));
           } catch (e) {}
           document.getElementById("loginCard").innerHTML =
             '<div class="loader"></div>' +
             '<p style="text-align:center;color:#555;">Signing you in...</p>';
-          setTimeout(function () { location.href = "welcome.html"; }, 2000);
+          setTimeout(function () { location.href = "welcome.html"; }, 5000);
         } else {
           message.textContent = data.error || "Invalid username or password";
           message.className = "error";
